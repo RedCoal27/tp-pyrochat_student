@@ -55,6 +55,9 @@ class CipheredGUI(BasicGUI):
 
     # Surcharger la fonction run_chat() pour y inclure la récupération du mot de passe
     def run_chat(self, sender, app_data) -> None:
+        '''
+        
+        '''
         # callback used by the connection windows to start a chat session
         host = dpg.get_value("connection_host")
         port = int(dpg.get_value("connection_port"))
@@ -86,6 +89,10 @@ class CipheredGUI(BasicGUI):
         
     #fonction qui chiffre un message avec pkcs7 et retourn un tuple (iv, message)
     def encrypt(self, message):
+        '''
+        message: message à chiffrer 
+        Chiffrer le message avec pkcs7 et retourner un tuple (iv, message_chiffré)
+        '''
         # Fonction qui chiffre un message avec pkcs7
         iv = os.urandom(TAILLE_OCTET)
         encryptor = Cipher(
@@ -99,7 +106,16 @@ class CipheredGUI(BasicGUI):
     
 
     #fonction qui déchiffre un message avec pkcs7 et retourne le message déchiffré
-    def decrypt(self, iv, message):
+    def decrypt(self, message):
+        '''
+        iv: iv du message
+        message: message à déchiffrer
+        Déchiffrer le message avec pkcs7 et retourner le message déchiffré
+        '''
+        #Récupérer l'iv depuis le tuple en base64
+        iv = base64.b64decode(message[0]['data'])
+        #Récupérer le message depuis le tuple en base64
+        message = base64.b64decode(message[1]['data'])
         # Fonction qui déchiffre un message avec pkcs7
         decryptor = Cipher(
             algorithms.AES(self.key),
@@ -123,13 +139,8 @@ class CipheredGUI(BasicGUI):
     def recv(self) -> None:
         if self._callback is not None:
             for user, message in self._callback.get():
-                #Récupérer l'iv depuis le tuple en base64
-                iv = base64.b64decode(message[0]['data'])
-                #Récupérer le message depuis le tuple en base64
-                message = base64.b64decode(message[1]['data'])
-
                 #Déchiffrer le message
-                message = self.decrypt(iv, message)
+                message = self.decrypt(message)
                 #Afficher le message déchiffré
                 self.update_text_screen(f"{user} : {message.decode()}")
             self._callback.clear()

@@ -30,5 +30,11 @@ Si ses primitives cryptographiques sont brisé, alors toutes les applications qu
 ### Question 3
 Le chiffrement préserve la confidentialité des données mais pas leur intégrité. Le chiffrement permet de cacher les données mais pas de s'assurer qu'elles n'ont pas été modifiées. Un serveur malveillant peut alors modifier les données pour les rendre inutilisable.
 
-## Question 4
+### Question 4
 Ici, il manque un système qui permet de vérifier l'intégrité des données.
+
+
+## Authenticated Symmetric Encryption
+### Question 1
+Le Fernet est moins risqué car la clé de chiffrement 
+
