@@ -2,16 +2,7 @@ import logging
 
 import dearpygui.dearpygui as dpg
 
-#import AES
-from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.primitives import padding
 
-
-import base64
 
 import os
 
@@ -20,8 +11,6 @@ from generic_callback import GenericCallback
 
 
 
-#nombre de bit
-BIT = 128
 
 
 # default values used to populate connection window
@@ -145,122 +134,11 @@ class BasicGUI:
 
 
 
-class CipheredGUI(BasicGUI):
-    # secure chat client
-    # Surcharger le constructeur pour y inclure le champ self._key
-    def __init__(self) -> None:
-        super().__init__()
-        self.key = None
-
-    # Surcharger la fonction _create_connection_window() pour y inclure un champ password  
-    def _create_connection_window(self) -> None:
-        # windows about connexion
-        with dpg.window(label="Connection", pos=(200, 150), width=400, height=300, show=False, tag="connection_windows"):
-
-            for field in ["host", "port", "name"]:
-                with dpg.group(horizontal=True):
-                    dpg.add_text(field)
-                    dpg.add_input_text(
-                        default_value=DEFAULT_VALUES[field], tag=f"connection_{field}")
-            # Ajouter un champ password with hidden value
-            with dpg.group(horizontal=True):
-                dpg.add_text("password")
-                dpg.add_input_text(
-                    default_value="", tag=f"connection_password", password=True)
-            dpg.add_button(label="Connect", callback=self.run_chat)
-
-
-    # Surcharger la fonction run_chat() pour y inclure la récupération du mot de passe
-    def run_chat(self, sender, app_data) -> None:
-        # callback used by the connection windows to start a chat session
-        host = dpg.get_value("connection_host")
-        port = int(dpg.get_value("connection_port"))
-        name = dpg.get_value("connection_name")
-        password = dpg.get_value("connection_password")
-        self._log.info(f"Connecting {name}@{host}:{port}")
-
-        self._callback = GenericCallback()
-
-        self._client = ChatClient(host, port)
-        self._client.start(self._callback)
-        self._client.register(name)
-
-        dpg.hide_item("connection_windows")
-        dpg.show_item("chat_windows")
-        dpg.set_value("screen", "Connecting")
-
-        # Sel
-        salt = "NeverGonnaGiveYouUp".encode('utf-8')
-
-        #clé de 16 octets
-        self.key = PBKDF2HMAC(
-            algorithm=hashes.SHA256(),
-            length=16,
-            salt=salt,
-            iterations=100000,
-            backend=default_backend()
-        ).derive(password.encode('utf-8'))
-        
-    #fonction qui chiffre un message avec pkcs7 et retourn un tuple (iv, message)
-    def encrypt(self, message):
-        # Fonction qui chiffre un message avec pkcs7
-        iv = os.urandom(16)
-        encryptor = Cipher(
-            algorithms.AES(self.key),
-            modes.CBC(iv),
-            backend=default_backend()
-        ).encryptor()
-        padder = padding.PKCS7(128).padder()
-        padded_data = padder.update(message.encode('utf-8')) + padder.finalize()
-        return (iv, encryptor.update(padded_data) + encryptor.finalize())
-    
-
-    #fonction qui déchiffre un message avec pkcs7 et retourne le message déchiffré
-    def decrypt(self, iv, message):
-        # Fonction qui déchiffre un message avec pkcs7
-        decryptor = Cipher(
-            algorithms.AES(self.key),
-            modes.CBC(iv),
-            backend=default_backend()
-        ).decryptor()
-        # Déchiffrer le message
-        unpadder = padding.PKCS7(BIT).unpadder()
-        data = decryptor.update(message) + decryptor.finalize()
-        return unpadder.update(data) + unpadder.finalize()
-
-    def send(self, text) -> None:
-        # function called to send a message to all (broadcasting)
-        #Chiffrer le message
-        message = self.encrypt(text)
-        print("Envoyé : ", message)
-        self._client.send_message(message)
-
-
-
-    def recv(self) -> None:
-        # function called to get incoming messages and display them
-        if self._callback is not None:
-            for user, message in self._callback.get():
-                #string to tuple
-                iv = base64.b64decode(message[0]['data'])
-                #Récupérer le message
-                message = base64.b64decode(message[1]['data'])
-
-                print("Reçu : ", iv, message)
-                #Déchiffrer le message
-                message = self.decrypt(iv, message)
-                #b string to string
-                self.update_text_screen(f"{user} : {message.decode('utf-8')}")
-            self._callback.clear()
-
-
-
-    
 if __name__ == "__main__":
 
     logging.basicConfig(level=logging.DEBUG)
 
     # instanciate the class, create context and related stuff, run the main loop
-    client = CipheredGUI()
+    client = BasicGUI()
     client.create()
     client.loop()
