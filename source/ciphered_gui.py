@@ -10,11 +10,13 @@ from generic_callback import GenericCallback
 from basic_gui import BasicGUI,DEFAULT_VALUES
 
 
-#nombre de bit
+#nombre de bit d'un bloc
 TAILLE_BLOCK = 128
+#nombre d'octet
+TAILLE_OCTET = 16
 
 
-#import AES
+# Import AES
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
@@ -76,7 +78,7 @@ class CipheredGUI(BasicGUI):
         #clé de 16 octets
         self.key = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
-            length=16,
+            length=TAILLE_OCTET,
             salt=salt,
             iterations=100000,
             backend=default_backend()
@@ -85,7 +87,7 @@ class CipheredGUI(BasicGUI):
     #fonction qui chiffre un message avec pkcs7 et retourn un tuple (iv, message)
     def encrypt(self, message):
         # Fonction qui chiffre un message avec pkcs7
-        iv = os.urandom(16)
+        iv = os.urandom(TAILLE_OCTET)
         encryptor = Cipher(
             algorithms.AES(self.key),
             modes.CBC(iv),
