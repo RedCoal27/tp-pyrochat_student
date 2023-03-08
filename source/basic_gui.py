@@ -5,13 +5,24 @@ import dearpygui.dearpygui as dpg
 #import AES
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives import padding
 
 
+import base64
 
 import os
 
 from chat_client import ChatClient
 from generic_callback import GenericCallback
+
+
+
+#nombre de bit
+BIT = 128
+
 
 # default values used to populate connection window
 DEFAULT_VALUES = {
@@ -19,6 +30,7 @@ DEFAULT_VALUES = {
     "port": "6666",
     "name": "foo_"+os.urandom(16).hex()[:4]
 }
+
 
 
 class BasicGUI:
@@ -181,31 +193,65 @@ class CipheredGUI(BasicGUI):
         salt = "NeverGonnaGiveYouUp".encode('utf-8')
 
         #clé de 16 octets
-        self.key = HKDF(
+        self.key = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=16,
             salt=salt,
-            info=None,
+            iterations=100000,
+            backend=default_backend()
         ).derive(password.encode('utf-8'))
         
-        #Key stretching
-        self.key = self.key[:16]
+    #fonction qui chiffre un message avec pkcs7 et retourn un tuple (iv, message)
+    def encrypt(self, message):
+        # Fonction qui chiffre un message avec pkcs7
+        iv = os.urandom(16)
+        encryptor = Cipher(
+            algorithms.AES(self.key),
+            modes.CBC(iv),
+            backend=default_backend()
+        ).encryptor()
+        padder = padding.PKCS7(128).padder()
+        padded_data = padder.update(message.encode('utf-8')) + padder.finalize()
+        return (iv, encryptor.update(padded_data) + encryptor.finalize())
+    
+
+    #fonction qui déchiffre un message avec pkcs7 et retourne le message déchiffré
+    def decrypt(self, iv, message):
+        # Fonction qui déchiffre un message avec pkcs7
+        decryptor = Cipher(
+            algorithms.AES(self.key),
+            modes.CBC(iv),
+            backend=default_backend()
+        ).decryptor()
+        # Déchiffrer le message
+        unpadder = padding.PKCS7(BIT).unpadder()
+        data = decryptor.update(message) + decryptor.finalize()
+        return unpadder.update(data) + unpadder.finalize()
 
     def send(self, text) -> None:
         # function called to send a message to all (broadcasting)
-        self._client.send_message(text)
+        #Chiffrer le message
+        message = self.encrypt(text)
+        print("Envoyé : ", message)
+        self._client.send_message(message)
+
 
 
     def recv(self) -> None:
         # function called to get incoming messages and display them
         if self._callback is not None:
-            print(self._callback.get())
             for user, message in self._callback.get():
-                #Décrypter le message
-                self.update_text_screen(f"{user} : {message}")
-            self._callback.clear()
-    
+                #string to tuple
+                iv = base64.b64decode(message[0]['data'])
+                #Récupérer le message
+                message = base64.b64decode(message[1]['data'])
 
+                print("Reçu : ", iv, message)
+                #Déchiffrer le message
+                message = self.decrypt(iv, message)
+                #b string to string
+                self.update_text_screen(f"{user} : {message.decode('utf-8')}")
+            self._callback.clear()
 
 
 
