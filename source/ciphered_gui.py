@@ -52,6 +52,11 @@ class CipheredGUI(BasicGUI):
                     default_value="", tag=f"connection_password", password=True)
             dpg.add_button(label="Connect", callback=self.run_chat)
 
+    def create(self):
+        super().create()
+        #change the name of the windows 
+        dpg.set_viewport_title("Secure Chat")
+
 
     # Surcharger la fonction run_chat() pour y inclure la récupération du mot de passe
     def run_chat(self, sender, app_data) -> None:
@@ -139,10 +144,15 @@ class CipheredGUI(BasicGUI):
     def recv(self) -> None:
         if self._callback is not None:
             for user, message in self._callback.get():
-                #Déchiffrer le message
-                message = self.decrypt(message)
-                #Afficher le message déchiffré
-                self.update_text_screen(f"{user} : {message.decode()}")
+                #essai de déchiffrer le message
+                try:
+                    #Déchiffrer le message
+                    message = self.decrypt(message)
+                    #Afficher le message déchiffré
+                    self.update_text_screen(f"{user} : {message.decode()}")
+                except:
+                    #Afficher le message chiffré
+                    self.update_text_screen(f"{user} : {message}")
             self._callback.clear()
 
 
