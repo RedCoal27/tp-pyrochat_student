@@ -2,10 +2,12 @@ import logging
 
 import dearpygui.dearpygui as dpg
 
+import os
+
 from chat_client import ChatClient
 from generic_callback import GenericCallback
 
-from ciphered_gui import CipheredGUI
+from fernet_gui import FernetGUI
 
 
 #nombre de bit d'un bloc
@@ -16,7 +18,11 @@ TAILLE_OCTET = 16
 
 # Import AES
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-from cryptography.hazmat.primitives.ciphers import Cipher
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives import padding
 # Import Fernet
 from cryptography.fernet import Fernet
 # Import sha256
@@ -24,7 +30,7 @@ import hashlib
 
 import base64
 
-class FernetGUI(CipheredGUI):
+class TimeFernetGUI(FernetGUI):
     def encrypt(self, message):
         # Encrypts plaintext with the given key.
         # The key must be 32 url-safe base64-encoded bytes.

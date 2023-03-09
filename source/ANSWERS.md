@@ -18,6 +18,7 @@ mathématiquement indéchiffrable"
 Mettre un chiffremment permettrait de garantir, au moins en partie, la confidentialité des messages.
 
 
+
 ## Chiffrement 
 ### Question 1
 La fonction uRandom permet de générer une chaine de caractère aléatoire de longueur donnée en paramètre. 
@@ -34,7 +35,13 @@ Le chiffrement préserve la confidentialité des données mais pas leur intégri
 Ici, il manque un système qui permet de vérifier l'intégrité des données.
 
 
+
 ## Authenticated Symmetric Encryption
 ### Question 1
-Le Fernet est moins risqué car la clé de chiffrement 
+Fernet est moins risqué que AES car au moment de déchiffrer le message, ça vérifie l'intégrité de celui ci en utilisant un timestamp et une valeur au début du message (0x80). Si le message a été modifié, le déchiffrement échoue et on sait alors que le message à été altéré.
 
+### Question 2
+Ce type d'attaque s'appelle une attaque par rejeu. Cela consiste a retransmettre un message déjà reçu ayant servie a l'authentification afin de se faire passer pour l'un des utilisateur authentifié en utilisant le même message d'authentification.
+
+### Question 3
+Pour éviter ce type d'attaque, on peut utiliser une limite de temsp avec l'aide du timestamp. On limite par exemple à 15s la durée max d'écart possible entre le timestamp du message et le timestamp actuel.
