@@ -15,6 +15,8 @@ TAILLE_BLOCK = 128
 #nombre d'octet
 TAILLE_OCTET = 16
 
+#itérations AES
+ITERATIONS = 100000
 
 # Import AES
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
@@ -29,7 +31,7 @@ import base64
 
 
 class CipheredGUI(BasicGUI):
-    # secure chat client
+    #client sécurisé
     # Surcharger le constructeur pour y inclure le champ self._key
     def __init__(self) -> None:
         super().__init__()
@@ -45,13 +47,14 @@ class CipheredGUI(BasicGUI):
                     dpg.add_text(field)
                     dpg.add_input_text(
                         default_value=DEFAULT_VALUES[field], tag=f"connection_{field}")
-            # Ajouter un champ password with hidden value
+            # Ajouter un champ password
             with dpg.group(horizontal=True):
                 dpg.add_text("password")
                 dpg.add_input_text(
                     default_value="", tag=f"connection_password", password=True)
             dpg.add_button(label="Connect", callback=self.run_chat)
 
+    # Surcharger la fonction create() pour y inclure le changement du nom de la fenêtre pour "Secure Chat"
     def create(self):
         super().create()
         #change the name of the windows 
@@ -60,10 +63,6 @@ class CipheredGUI(BasicGUI):
 
     # Surcharger la fonction run_chat() pour y inclure la récupération du mot de passe
     def run_chat(self, sender, app_data) -> None:
-        '''
-        
-        '''
-        # callback used by the connection windows to start a chat session
         host = dpg.get_value("connection_host")
         port = int(dpg.get_value("connection_port"))
         name = dpg.get_value("connection_name")
@@ -80,7 +79,7 @@ class CipheredGUI(BasicGUI):
         dpg.show_item("chat_windows")
         dpg.set_value("screen", "Connecting")
 
-        # Sel
+        # Sel statique (oui c'est un rickroll)
         salt = "NeverGonnaGiveYouUp".encode()
 
         #clé de 16 octets
@@ -88,7 +87,7 @@ class CipheredGUI(BasicGUI):
             algorithm=hashes.SHA256(),
             length=TAILLE_OCTET,
             salt=salt,
-            iterations=100000,
+            iterations=ITERATIONS,
             backend=default_backend()
         ).derive(password.encode())
         
@@ -107,13 +106,13 @@ class CipheredGUI(BasicGUI):
         ).encryptor()
         padder = padding.PKCS7(TAILLE_BLOCK).padder()
         padded_data = padder.update(message.encode()) + padder.finalize()
+        #retourner un tuple (iv, message_chiffré)
         return (iv, encryptor.update(padded_data) + encryptor.finalize())
     
 
     #fonction qui déchiffre un message avec pkcs7 et retourne le message déchiffré
     def decrypt(self, message):
         '''
-        iv: iv du message
         message: message à déchiffrer
         Déchiffrer le message avec pkcs7 et retourner le message déchiffré
         '''
@@ -127,13 +126,18 @@ class CipheredGUI(BasicGUI):
             modes.CBC(iv),
             backend=default_backend()
         ).decryptor()
+
         # Déchiffrer le message
         unpadder = padding.PKCS7(TAILLE_BLOCK).unpadder()
         data = decryptor.update(message) + decryptor.finalize()
+        #retourner le message déchiffré
         return unpadder.update(data) + unpadder.finalize()
 
     def send(self, text) -> None:
-        # function called to send a message to all (broadcasting)
+        '''
+        text: message à envoyer
+        Chiffre le message et l'envoye
+        '''
         #Chiffrer le message
         message = self.encrypt(text)
         #Envoyer le message
@@ -142,6 +146,9 @@ class CipheredGUI(BasicGUI):
 
     #fonction de réception des messages
     def recv(self) -> None:
+        '''
+        Récupérer les messages et les afficher
+        '''
         if self._callback is not None:
             for user, message in self._callback.get():
                 #essai de déchiffrer le message

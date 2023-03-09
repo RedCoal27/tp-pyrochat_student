@@ -8,12 +8,6 @@ from generic_callback import GenericCallback
 from ciphered_gui import CipheredGUI
 
 
-#nombre de bit d'un bloc
-TAILLE_BLOCK = 128
-#nombre d'octet
-TAILLE_OCTET = 16
-
-
 # Import AES
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.ciphers import Cipher
@@ -26,24 +20,23 @@ import base64
 
 class FernetGUI(CipheredGUI):
     def encrypt(self, message):
-        # Encrypts plaintext with the given key.
-        # The key must be 32 url-safe base64-encoded bytes.
-        # The plaintext must be a bytes object.
-        # The return value is a url-safe base64-encoded bytes object.
+        '''
+        message : message à chiffrer
+        Chiffre le message avec Fernet
+        '''
         f = Fernet(self.key)
         return f.encrypt(bytes(message,'utf-8'))
     
     def decrypt(self, message):
-        # Decrypts ciphertext with the given key.
-        # The key must be 32 url-safe base64-encoded bytes.
-        # The ciphertext must be a url-safe base64-encoded bytes object.
-        # The return value is a bytes object.
+        '''
+        message : message à déchiffrer
+        Déchiffre le message avec Fernet
+        '''
         message = base64.b64decode(message['data'])
         f = Fernet(self.key)
         return f.decrypt(str(message, 'utf-8'))
 
     def run_chat(self, sender, app_data) -> None:
-        # callback used by the connection windows to start a chat session
         host = dpg.get_value("connection_host")
         port = int(dpg.get_value("connection_port"))
         name = dpg.get_value("connection_name")
