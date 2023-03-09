@@ -1,18 +1,9 @@
 import logging
 
-import dearpygui.dearpygui as dpg
-
-from chat_client import ChatClient
-from generic_callback import GenericCallback
-
 from fernet_gui import FernetGUI
 
 import time
 
-#nombre de bit d'un bloc
-TAILLE_BLOCK = 128
-#nombre d'octet
-TAILLE_OCTET = 16
 
 
 # Import Fernet
