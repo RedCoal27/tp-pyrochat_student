@@ -45,3 +45,17 @@ Ce type d'attaque s'appelle une attaque par rejeu. Cela consiste a retransmettre
 
 ### Question 3
 Pour éviter ce type d'attaque, on peut utiliser une limite de temsp avec l'aide du timestamp. On limite par exemple à 15s la durée max d'écart possible entre le timestamp du message et le timestamp actuel.
+
+## TTL
+### Question 1
+Aucune différence n'est visible, la longueur du message reste la même.
+
+### Question 2
+En retirant 45s au timestamp, le message est considéré comme invalide et le déchiffrement échoue alors. Cela est du à la vérification du timestamp et du fait que l'on accepte un écart maximum de 30s.
+
+### Question 3
+Dans la pratique, il faut réduire le temps pour sécuriser les messages car en 30s, une machine aurait le temps de faire une attaque par rejeu.
+L'autre limite également c'est que si il y a de la latence sur la connexion, les messages peuvent être considérés comme invalides alors qu'ils ne le sont pas.
+
+
+## Regard critique

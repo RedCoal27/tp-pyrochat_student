@@ -151,8 +151,8 @@ class CipheredGUI(BasicGUI):
                     #Afficher le message déchiffré
                     self.update_text_screen(f"{user} : {message.decode()}")
                 except:
-                    #Afficher le message chiffré
-                    self.update_text_screen(f"{user} : {message}")
+                    #Afficher le message chiffré dans les logs
+                    self._log.error(f"Error while decrypting message: {message}")
             self._callback.clear()
 
 

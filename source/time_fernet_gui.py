@@ -52,7 +52,7 @@ class TimeFernetGUI(FernetGUI):
         except InvalidToken as e:
             logging.error(e)
             print("Invalid Token")
-            return message
+            raise InvalidToken
         
 
         
