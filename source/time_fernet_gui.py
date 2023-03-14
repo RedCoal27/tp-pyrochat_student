@@ -32,7 +32,7 @@ class TimeFernetGUI(FernetGUI):
     def decrypt(self, message):
         '''
         message : message à déchiffrer
-        
+
         Déchiffre le message avec Fernet et le timestamp
         '''
         try :
@@ -45,8 +45,7 @@ class TimeFernetGUI(FernetGUI):
                 ttl=TTL
                 )
         except InvalidToken as e:
-            logging.error(e)
-            print("Invalid Token")
+            logging.error("Invalid Token")
             raise InvalidToken
 
 
