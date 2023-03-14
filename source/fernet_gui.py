@@ -22,6 +22,7 @@ class FernetGUI(CipheredGUI):
     def encrypt(self, message):
         '''
         message : message à chiffrer
+        
         Chiffre le message avec Fernet
         '''
         f = Fernet(self.key)
@@ -30,6 +31,7 @@ class FernetGUI(CipheredGUI):
     def decrypt(self, message):
         '''
         message : message à déchiffrer
+        
         Déchiffre le message avec Fernet
         '''
         message = base64.b64decode(message['data'])

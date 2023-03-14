@@ -59,3 +59,6 @@ L'autre limite également c'est que si il y a de la latence sur la connexion, le
 
 
 ## Regard critique
+Le serveur est non sécurisé et n'a pas d'autentification. Il est donc possible de se connecter à celui ci sans être authentifié. N'importe quel client un peu modifié ou autre logiciel utilisant le même port pourrait faire transiter des informations par le serveur autre que des messages. Avec suffisament de requêtes cela pourrait faire planter le serveur et les clients connecté au serveur.
+Ajouter un système d'authentification et ajout d'un header dans les message permettrait de limiter ces soucis. 
+Le port 6666 peut également poser problème. Même si il est utilisé par les chat, il est également très utilisé par les virus donc il n'est pas très recommandé d'ouvrir ce port en publique sans avoir une analyse réseau sur ce qu'il se passe sur ce port.

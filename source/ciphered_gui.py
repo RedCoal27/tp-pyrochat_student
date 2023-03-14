@@ -94,8 +94,10 @@ class CipheredGUI(BasicGUI):
     #fonction qui chiffre un message avec pkcs7 et retourn un tuple (iv, message)
     def encrypt(self, message):
         '''
-        message: message à chiffrer 
+        message: message à chiffrer
+
         Chiffrer le message avec pkcs7 et retourner un tuple (iv, message_chiffré)
+
         '''
         # Fonction qui chiffre un message avec pkcs7
         iv = os.urandom(TAILLE_OCTET)
@@ -104,8 +106,10 @@ class CipheredGUI(BasicGUI):
             modes.CBC(iv),
             backend=default_backend()
         ).encryptor()
+        #ajouter du paddind selon la taille du bloc
         padder = padding.PKCS7(TAILLE_BLOCK).padder()
         padded_data = padder.update(message.encode()) + padder.finalize()
+
         #retourner un tuple (iv, message_chiffré)
         return (iv, encryptor.update(padded_data) + encryptor.finalize())
     
@@ -114,6 +118,7 @@ class CipheredGUI(BasicGUI):
     def decrypt(self, message):
         '''
         message: message à déchiffrer
+
         Déchiffrer le message avec pkcs7 et retourner le message déchiffré
         '''
         #Récupérer l'iv depuis le tuple en base64
@@ -136,7 +141,8 @@ class CipheredGUI(BasicGUI):
     def send(self, text) -> None:
         '''
         text: message à envoyer
-        Chiffre le message et l'envoye
+
+        Chiffre le message et l'envoie
         '''
         #Chiffrer le message
         message = self.encrypt(text)

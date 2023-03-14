@@ -22,6 +22,7 @@ class TimeFernetGUI(FernetGUI):
     def encrypt(self, message):
         '''
         message : message à chiffrer
+
         Chiffre le message avec Fernet et le timestamp
         '''
         f = Fernet(self.key)
@@ -31,6 +32,7 @@ class TimeFernetGUI(FernetGUI):
     def decrypt(self, message):
         '''
         message : message à déchiffrer
+        
         Déchiffre le message avec Fernet et le timestamp
         '''
         try :
