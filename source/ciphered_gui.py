@@ -18,6 +18,9 @@ TAILLE_OCTET = 16
 #itérations AES
 ITERATIONS = 100000
 
+# Sel statique
+SALT = "NeverGonnaGiveYouUp".encode()
+
 # Import AES
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
@@ -79,14 +82,12 @@ class CipheredGUI(BasicGUI):
         dpg.show_item("chat_windows")
         dpg.set_value("screen", "Connecting")
 
-        # Sel statique (oui c'est un rickroll)
-        salt = "NeverGonnaGiveYouUp".encode()
 
         #clé de 16 octets
         self.key = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=TAILLE_OCTET,
-            salt=salt,
+            salt=SALT,
             iterations=ITERATIONS,
             backend=default_backend()
         ).derive(password.encode())
