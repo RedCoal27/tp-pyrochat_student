@@ -39,7 +39,7 @@ class BasicGUI:
         with dpg.window(label="Chat", pos=(0, 0), width=800, height=600, show=False, tag="chat_windows", on_close=self.on_close):
             dpg.add_input_text(default_value="Readonly\n\n\n\n\n\n\n\nfff",
                                multiline=True, readonly=True, tag="screen", width=790, height=525)
-            dpg.add_input_text(default_value="some text", tag="input",
+            dpg.add_input_text(default_value="Salut, ça va?", tag="input",
                                on_enter=True, callback=self.text_callback, width=790)
 
     def _create_connection_window(self) -> None:
