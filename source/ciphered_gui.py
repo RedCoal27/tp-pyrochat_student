@@ -138,7 +138,7 @@ class CipheredGUI(BasicGUI):
         unpadder = padding.PKCS7(TAILLE_BLOCK).unpadder()
         data = decryptor.update(message) + decryptor.finalize()
         #retourner le message déchiffré
-        return unpadder.update(data) + unpadder.finalize()
+        return (unpadder.update(data) + unpadder.finalize()).decode()
 
     def send(self, text) -> None:
         '''
@@ -164,7 +164,7 @@ class CipheredGUI(BasicGUI):
                     #Déchiffrer le message
                     message = self.decrypt(message)
                     #Afficher le message déchiffré
-                    self.update_text_screen(f"{user} : {message.decode()}")
+                    self.update_text_screen(f"{user} : {message}")
                 except:
                     #Afficher le message chiffré dans les logs
                     self._log.error(f"Error while decrypting message: {message}")

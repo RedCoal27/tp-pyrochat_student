@@ -43,7 +43,7 @@ class TimeFernetGUI(FernetGUI):
                 message,
                 current_time=temps,
                 ttl=TTL
-                )
+                ).decode()
         except InvalidToken as e:
             logging.error("Invalid Token")
             raise InvalidToken
