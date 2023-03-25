@@ -5,13 +5,9 @@ from fernet_gui import FernetGUI
 import time
 
 
-
 # Import Fernet
 from cryptography.fernet import Fernet
 from cryptography.fernet import InvalidToken
-
-# Import sha256
-import hashlib
 
 # Import base64
 import base64

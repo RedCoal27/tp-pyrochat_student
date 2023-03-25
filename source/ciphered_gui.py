@@ -22,13 +22,10 @@ ITERATIONS = 100000
 SALT = "NeverGonnaGiveYouUp".encode()
 
 # Import AES
-from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import hashes,padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.primitives import padding
-
 
 import base64
 

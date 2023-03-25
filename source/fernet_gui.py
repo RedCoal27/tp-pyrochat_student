@@ -8,9 +8,6 @@ from generic_callback import GenericCallback
 from ciphered_gui import CipheredGUI
 
 
-# Import AES
-from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-from cryptography.hazmat.primitives.ciphers import Cipher
 # Import Fernet
 from cryptography.fernet import Fernet
 # Import sha256
