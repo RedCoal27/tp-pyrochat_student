@@ -104,10 +104,11 @@ class CipheredGUI(BasicGUI):
         iv = os.urandom(TAILLE_OCTET)
         encryptor = Cipher(
             algorithms.AES(self.key),
-            modes.CBC(iv),
+            modes.CTR(iv),
             backend=default_backend()
         ).encryptor()
-        #ajouter du paddind selon la taille du bloc
+
+        #ajouter du padding selon la taille du bloc
         padder = padding.PKCS7(TAILLE_BLOCK).padder()
         padded_data = padder.update(message.encode()) + padder.finalize()
 
@@ -129,7 +130,7 @@ class CipheredGUI(BasicGUI):
         # Fonction qui déchiffre un message avec pkcs7
         decryptor = Cipher(
             algorithms.AES(self.key),
-            modes.CBC(iv),
+            modes.CTR(iv),
             backend=default_backend()
         ).decryptor()
 
