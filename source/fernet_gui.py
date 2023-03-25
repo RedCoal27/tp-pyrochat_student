@@ -33,7 +33,7 @@ class FernetGUI(CipheredGUI):
         '''
         message = base64.b64decode(message['data'])
         f = Fernet(self.key)
-        return f.decrypt(str(message, 'utf-8')).decode()
+        return f.decrypt(message).decode()
 
     def run_chat(self, sender, app_data) -> None:
         host = dpg.get_value("connection_host")
